@@ -1,6 +1,5 @@
 package com.gcit.lms.dao;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,10 +7,7 @@ import java.util.List;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
 
-import com.gcit.lms.entity.Author;
-import com.gcit.lms.entity.BookLoan;
 import com.gcit.lms.entity.Borrower;
-import com.gcit.lms.entity.Genre;
 
 public class BorrowerDAO  extends BaseDAO implements ResultSetExtractor<List<Borrower>> {
 	

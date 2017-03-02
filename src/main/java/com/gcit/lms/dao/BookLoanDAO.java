@@ -1,6 +1,5 @@
 package com.gcit.lms.dao;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -9,19 +8,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.springframework.jdbc.core.ResultSetExtractor;
+
 import com.gcit.lms.entity.Book;
 import com.gcit.lms.entity.BookLoan;
 import com.gcit.lms.entity.Borrower;
 import com.gcit.lms.entity.LibraryBranch;
 
-public class BookLoanDAO extends BaseDAO {
+public class BookLoanDAO extends BaseDAO implements ResultSetExtractor<List<BookLoan>> {
 
-	public BookLoanDAO(Connection conn) {
-		super(conn);
-		// TODO Auto-generated constructor stub
-	}
-
-	
 	
 public void checkOutBook(int bookId, int cardNo,int branchId) throws ClassNotFoundException, SQLException{
 		
@@ -38,7 +33,7 @@ public void checkOutBook(int bookId, int cardNo,int branchId) throws ClassNotFou
 		System.out.println(dueDate);
 
 			
-			save("INSERT INTO tbl_book_loans (bookId,branchId,cardNo,dateOut,dueDate) VALUES (?,?,?,?,?)", 
+			template.update("INSERT INTO tbl_book_loans (bookId,branchId,cardNo,dateOut,dueDate) VALUES (?,?,?,?,?)", 
 					new Object[] { bookId,branchId,cardNo,checkOutDay, dueDate});	
 		
 	
@@ -52,7 +47,7 @@ public void returnCheckedOutBook(String checkOUt) throws ClassNotFoundException,
 	String chekInDate = dateFormat.format(timestamp);
 
 			
-		save("UPDATE   tbl_book_loans  SET  dateIn = ? WHERE  dateOut = ?  AND dateIn IS NULL", 
+	template.update("UPDATE   tbl_book_loans  SET  dateIn = ? WHERE  dateOut = ?  AND dateIn IS NULL", 
 				new Object[] {chekInDate, checkOUt});	
 	
 	
@@ -69,7 +64,7 @@ public void returnCheckedOutBook(Book bk, Borrower br, LibraryBranch lb) throws 
 	
 	if(bk!=null && br!=null && lb !=null){
 		
-		save("UPDATE   tbl_book_loans  SET  dateIn = ? WHERE  bookId = ? "
+		template.update("UPDATE   tbl_book_loans  SET  dateIn = ? WHERE  bookId = ? "
 			+ "AND  branchId = ? AND cardNo = ?  AND dateIn IS NULL", 
 				new Object[] {chekInDate, bk.getBookId(),lb.getBranchId(),br.getCardNo()});	
 	
@@ -78,38 +73,23 @@ public void returnCheckedOutBook(Book bk, Borrower br, LibraryBranch lb) throws 
 }
 
 public List<BookLoan> readAllCheckOutBooksByCardNo(int CardNo) throws ClassNotFoundException, SQLException {
-	return readAll("select * from tbl_book_loans where CardNo = ? AND dateIn IS NULL", new Object[] {CardNo});
+	return template.query("select * from tbl_book_loans where CardNo = ? AND dateIn IS NULL", new Object[] {CardNo},this);
 }
 
 
 
 @Override
-public  List<BookLoan> extractData(ResultSet rs) throws SQLException, ClassNotFoundException {
+public  List<BookLoan> extractData(ResultSet rs) throws SQLException {
 	
 	
 	List<BookLoan> bookLoans = new ArrayList<>();
 
 	while (rs.next()) {
-		LibraryBranchDAO lbDAO = new LibraryBranchDAO(conn);
-		BookDAO bDAO = new BookDAO(conn);
-		BorrowerDAO  brDAO= new BorrowerDAO(conn);
-			
+		
 		BookLoan bkl =new BookLoan();
 		bkl.setCheckoutTime(rs.getString("dateOut"));
 		bkl.setDueDate(rs.getString("dateOut"));
 		bkl.setCheckin(rs.getString("dateIn"));
-		
-		if (rs.getInt("bookId") > 0) {
-			bkl.setBook(bDAO.readBookByPk(rs.getInt("bookId")));
-		}
-		
-		if (rs.getInt("branchId") > 0) {
-			bkl.setLibraryBranch(lbDAO.readLibraryBranchByPk(rs.getInt("branchId")));
-		}
-		
-		if (rs.getInt("branchId") > 0) {
-			bkl.setBorrower(brDAO.readAuthorByPk(rs.getInt("cardNo")));
-		}
 		
 	
 		bookLoans.add(bkl);
@@ -120,10 +100,4 @@ public  List<BookLoan> extractData(ResultSet rs) throws SQLException, ClassNotFo
 	
 }
 
-
-
-@Override
-public <T> List<T> extractDataFirstLevel(ResultSet rs) throws SQLException, ClassNotFoundException {
-	return null;
-}
 }
