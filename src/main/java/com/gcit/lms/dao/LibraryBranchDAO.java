@@ -1,57 +1,51 @@
 package com.gcit.lms.dao;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.gcit.lms.entity.LibraryBranch;
-import com.gcit.lms.entity.Publisher;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
-public class LibraryBranchDAO extends BaseDAO {
+import com.gcit.lms.entity.LibraryBranch;
+
+public class LibraryBranchDAO extends BaseDAO implements ResultSetExtractor<List<LibraryBranch>>  {
 	
-	
-	
-	
-	
-	public LibraryBranchDAO (Connection conn) {
-		super(conn);
-	}
 	
 	public LibraryBranch readLibraryBranchByPk(Integer branchId) throws ClassNotFoundException, SQLException{
-		List<LibraryBranch> libraryBranches = readAll("select * from tbl_library_branch where branchId = ?", new Object[]{branchId});
+		List<LibraryBranch> libraryBranches = template.query("select * from tbl_library_branch where"
+				+ " branchId = ?", new Object[]{branchId},this);
 		if(libraryBranches!=null && !libraryBranches.isEmpty()){
 			return libraryBranches.get(0);
 		}
 		return null;
 	}
 	public Integer addLibraryBranchDAOWithID(LibraryBranch libraryBranch) throws ClassNotFoundException, SQLException {
-		return saveWithID("INSERT INTO tbl_library_branch  (branchName,branchAddress)  VALUES(?,?)", 
+		return template.update("INSERT INTO tbl_library_branch  (branchName,branchAddress)  VALUES(?,?)", 
 				new Object[] { libraryBranch.getBranchName(),libraryBranch.getBranchAddress() });
 	}
 	public void addLibraryBranch(LibraryBranch libraryBranch) throws SQLException, ClassNotFoundException {
-		save("INSERT INTO tbl_library_branch  (branchName,branchAddress)  VALUES(?,?)",
+		template.update("INSERT INTO tbl_library_branch  (branchName,branchAddress)  VALUES(?,?)",
 				new Object[] { libraryBranch.getBranchName(),libraryBranch.getBranchAddress() });
 	}
 	public void updateLibraryBranch(LibraryBranch libraryBranch) throws SQLException, ClassNotFoundException {
-		save("UPDATE  tbl_library_branch  SET branchName =? "
+		template.update("UPDATE  tbl_library_branch  SET branchName =? "
 				+ ",branchAddress = ?  WHERE branchId = ? ", 
 				new Object[] {libraryBranch.getBranchName(),libraryBranch.getBranchAddress(),libraryBranch.getBranchId()});
 	}
 	public void deleteLibraryBranch(LibraryBranch libraryBranch) throws SQLException, ClassNotFoundException {
-		save("delete  from tbl_library_branch where branchId = ?", new Object[] {libraryBranch.getBranchId()});
+		template.update("delete  from tbl_library_branch where branchId = ?", new Object[] {libraryBranch.getBranchId()});
 	}
 	
 	public List<LibraryBranch> readAllLibraryBranches() throws ClassNotFoundException, SQLException{
-		return readAll("select * from tbl_library_branch", null);
+		return template.query("select * from tbl_library_branch", this);
 	}
 	
 	public List<LibraryBranch> readAllLibraryBranchByName(String branchName) throws ClassNotFoundException, SQLException{
-		return readAll("select * from tbl_library_branch where branchName like ?", new Object[]{"%"+branchName+"%"});
+		return  template.query("select * from tbl_library_branch where branchName "
+				+ "like ?", new Object[]{"%"+branchName+"%"},this);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public  List<LibraryBranch> extractData(ResultSet rs) throws SQLException {
 		List<LibraryBranch> libraryBranches = new ArrayList<>();
@@ -66,13 +60,7 @@ public class LibraryBranchDAO extends BaseDAO {
 		return libraryBranches;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<LibraryBranch> extractDataFirstLevel(ResultSet rs) throws SQLException, ClassNotFoundException {
 	
-		return null;
-	}
-
 	
 	
 
