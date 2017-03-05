@@ -45,6 +45,8 @@ public class GenreDAO extends BaseDAO implements ResultSetExtractor<List<Genre>>
 		return null;
 	}
 	
+	
+
 	public void deleteBookGenre( Integer genreId) throws ClassNotFoundException, SQLException {
 		template.update("delete  from tbl_book_genres where genre_id = ?", new Object[] {genreId});
 	}

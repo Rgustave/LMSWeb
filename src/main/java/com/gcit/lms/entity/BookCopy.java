@@ -2,17 +2,35 @@ package com.gcit.lms.entity;
 
 import java.io.Serializable;
 
-public class BookCopy  implements Serializable  {
+
+public class BookCopy implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 3392043888490141379L;
+	private static final long serialVersionUID = 1L;
+	private int bookId;
+	private int branchId;
+	private int noOfCopies;
 	
-	
-	private Book book;
-	private LibraryBranch libraryBranch;
-	private Integer bookCopies;
+	public int getBookId() {
+		return bookId;
+	}
+	public void setBookId(int bookId) {
+		this.bookId = bookId;
+	}
+	public int getBranchId() {
+		return branchId;
+	}
+	public void setBranchId (int branchId) {
+		this.branchId = branchId;
+	}
+	public int getNoOfCopies() {
+		return noOfCopies;
+	}
+	public void setNoOfCopies(int noOfCopies) {
+		this.noOfCopies = noOfCopies;
+	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -20,9 +38,9 @@ public class BookCopy  implements Serializable  {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((book == null) ? 0 : book.hashCode());
-		result = prime * result + ((bookCopies == null) ? 0 : bookCopies.hashCode());
-		result = prime * result + ((libraryBranch == null) ? 0 : libraryBranch.hashCode());
+		result = prime * result + bookId;
+		result = prime * result + branchId;
+		result = prime * result + noOfCopies;
 		return result;
 	}
 	/* (non-Javadoc)
@@ -37,63 +55,16 @@ public class BookCopy  implements Serializable  {
 		if (getClass() != obj.getClass())
 			return false;
 		BookCopy other = (BookCopy) obj;
-		if (book == null) {
-			if (other.book != null)
-				return false;
-		} else if (!book.equals(other.book))
+		if (bookId != other.bookId)
 			return false;
-		if (bookCopies == null) {
-			if (other.bookCopies != null)
-				return false;
-		} else if (!bookCopies.equals(other.bookCopies))
+		if (branchId != other.branchId)
 			return false;
-		if (libraryBranch == null) {
-			if (other.libraryBranch != null)
-				return false;
-		} else if (!libraryBranch.equals(other.libraryBranch))
+		if (noOfCopies != other.noOfCopies)
 			return false;
 		return true;
 	}
-	/**
-	 * @return the book
-	 */
-	public Book getBook() {
-		return book;
-	}
-	/**
-	 * @param book the book to set
-	 */
-	public void setBook(Book book) {
-		this.book = book;
-	}
-	/**
-	 * @return the libraryBranch
-	 */
-	public LibraryBranch getLibraryBranch() {
-		return libraryBranch;
-	}
-	/**
-	 * @param libraryBranch the libraryBranch to set
-	 */
-	public void setLibraryBranch(LibraryBranch libraryBranch) {
-		this.libraryBranch = libraryBranch;
-	}
-	/**
-	 * @return the bookCopies
-	 */
-	public Integer getBookCopies() {
-		return bookCopies;
-	}
-	/**
-	 * @param bookCopies the bookCopies to set
-	 */
-	public void setBookCopies(Integer bookCopies) {
-		this.bookCopies = bookCopies;
-	}
 	
 	
 	
-	
-	
-
 }
+

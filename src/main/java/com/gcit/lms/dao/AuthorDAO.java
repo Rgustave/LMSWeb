@@ -11,6 +11,10 @@ import com.gcit.lms.entity.Author;
 
 
 public class AuthorDAO extends BaseDAO implements ResultSetExtractor<List<Author>>{
+	
+	public Integer addAuthorDAOWithID(Author author) throws ClassNotFoundException, SQLException {
+		 return template.update("insert into tbl_author (authorName) values (?)", new Object[] { author.getAuthorName() });
+	}
 
 	public void addAuthor(Author author) throws SQLException, ClassNotFoundException {
 		template.update("insert into tbl_author (authorName) values (?)", new Object[] {author.getAuthorName()});
@@ -24,25 +28,27 @@ public class AuthorDAO extends BaseDAO implements ResultSetExtractor<List<Author
 		template.update("delete from tbl_author where authorId = ?", new Object[] {author.getAuthorId()});
 	}
 	
-	public List<Author> readAllAuthors(Integer pageNo) throws ClassNotFoundException, SQLException{
-		setPageNo(pageNo);
+	public List<Author> readAllAuthors() throws ClassNotFoundException, SQLException{
 		return template.query("select * from tbl_author", this);
 	}
 	
 	public List<Author> readAllAuthorsByName(String authorName) throws ClassNotFoundException, SQLException{
 		return template.query("select * from tbl_author where authorName like ?", new Object[]{"%"+authorName+"%"}, this);
 	}
-	
-//	public Integer getAuthorsCount() throws ClassNotFoundException, SQLException{
-//		return getCount("tbl_author");
-//	}
-	
+		
 	public Author readAuthorByPk(Integer authorId) throws ClassNotFoundException, SQLException{
 		List<Author> authors = template.query("select * from tbl_author where authorId = ?", new Object[]{authorId}, this);
 		if(authors!=null && !authors.isEmpty()){
 			return authors.get(0);
 		}
 		return null;
+	}
+	
+	public void deleteBookAuthor(Integer authorId) throws SQLException, ClassNotFoundException {
+		 template.update("delete  from tbl_book_authors where authorId = ?", new Object[] {authorId});
+	}
+	public void addBookAuthors(Integer AuthorId, Integer bookId) throws ClassNotFoundException, SQLException {
+		 template.update("insert into tbl_book_authors (bookId,authorId ) values (? , ?)", new Object[] {bookId,AuthorId});
 	}
 	
 	@Override

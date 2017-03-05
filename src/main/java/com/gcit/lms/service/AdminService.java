@@ -1,8 +1,9 @@
 package com.gcit.lms.service;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gcit.lms.dao.AuthorDAO;
 import com.gcit.lms.dao.BookDAO;
@@ -20,693 +21,364 @@ import com.gcit.lms.entity.Publisher;
 
 public class AdminService {
 
+	@Autowired
+	AuthorDAO authorDAO;
+	@Autowired
+	BookDAO bookDAO;
+	@Autowired
+	PublisherDAO publisherDAO;
+	@Autowired
+	BorrowerDAO borrowerDAO;
+	@Autowired
+	LibraryBranchDAO branchDAO;
+	@Autowired
+	GenreDAO genreDAO;
+	@Autowired
+	BookLoanDAO bookLoanDAO;
+
 	ConnectionUtil util = new ConnectionUtil();
 
-	public void addAuthor(Author author) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			BookDAO bdao = new BookDAO(conn);
-			AuthorDAO adao = new AuthorDAO(conn);
-			Integer authorId = adao.addAuthorDAOWithID(author);
-			if (author.getBooks() != null && !author.getBooks().isEmpty()) {
-				for (Book b : author.getBooks()) {
-					bdao.addBookAuthors(authorId, b.getBookId());		
-				}
-			}
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-	}
-	
-	
-	
-	
-	public void addLibraryBranch(LibraryBranch libraryBranch) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			LibraryBranchDAO lbdao = new LibraryBranchDAO(conn);
-			lbdao.addLibraryBranch(libraryBranch);
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-	}
-	
+	@Transactional
+	public void addAuthor(Author author) throws Exception {
 
-	public void addPublisher(Publisher publisher) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			BookDAO bdao = new BookDAO(conn);
-			
-			PublisherDAO pdao = new PublisherDAO(conn);
-			Integer publisherId = pdao.addPublisherWithID(publisher);
-			if (publisher.getBooks() != null && !publisher.getBooks().isEmpty()) {
-				for (Book b : publisher.getBooks()) {
-					bdao.updateBookPublisher(publisherId, b.getBookId());	
-				}
+		Integer authorId = 0;
+
+		if (author == null || author.getAuthorName() == null || author.getAuthorName().length() == 0
+				|| author.getAuthorName().length() > 45) {
+			throw new Exception("Invalid Input");
+		} else {
+
+			authorId = authorDAO.addAuthorDAOWithID(author);
+		}
+		if (author.getBooks() != null && !author.getBooks().isEmpty()) {
+			for (Book b : author.getBooks()) {
+				bookDAO.addBookAuthors(authorId, b.getBookId());
 			}
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
+		}
+
+	}
+
+	@Transactional
+	public void addLibraryBranch(LibraryBranch libraryBranch) throws Exception {
+
+		if (libraryBranch == null || libraryBranch.getBranchName() == null
+				|| libraryBranch.getBranchName().length() == 0 || libraryBranch.getBranchName().length() > 45) {
+			throw new Exception("Invalid input");
+		} else if (libraryBranch == null || libraryBranch.getBranchAddress() == null
+				|| libraryBranch.getBranchAddress().length() == 0 || libraryBranch.getBranchAddress().length() > 45) {
+			throw new Exception("Invalid input");
+		} else {
+			branchDAO.addLibraryBranch(libraryBranch);
 		}
 	}
 
-	public void addGenre(Genre genre) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			BookDAO bdao = new BookDAO(conn);
-			GenreDAO gdao = new GenreDAO(conn);
-			Integer genreId = gdao.addGenreDAOWithID(genre);
-			if (genre.getBooks() != null && !genre.getBooks().isEmpty()) {
+	@Transactional
+	public void addPublisher(Publisher publisher) throws Exception {
+
+		Integer publisherId = 0;
+
+		if (publisher == null || publisher.getPublisherName() == null || publisher.getPublisherName().length() == 0
+				|| publisher.getPublisherName().length() > 45) {
+			throw new Exception("Invalid input");
+		} else if (publisher == null || publisher.getPublisherAddress() == null
+				|| publisher.getPublisherAddress().length() == 0 || publisher.getPublisherAddress().length() > 45) {
+			throw new Exception("Invalid input");
+		} else if (publisher == null || publisher.getPublisherPhone() == null
+				|| publisher.getPublisherPhone().length() == 0 || publisher.getPublisherPhone().length() > 45) {
+			throw new Exception("Invalid input");
+		} else {
+			publisherId = publisherDAO.addPublisherWithID(publisher);
+		}
+		if (publisher.getBooks() != null && !publisher.getBooks().isEmpty()) {
+			for (Book b : publisher.getBooks()) {
+				bookDAO.updateBookPublisher(publisherId, b.getBookId());
+			}
+		}
+
+	}
+
+	@Transactional
+	public void addGenre(Genre genre) throws Exception {
+		Integer genreId = 0;
+		if (genre == null || genre.getGenreName() == null || genre.getGenreName().length() == 0
+				|| genre.getGenreName().length() > 45) {
+			throw new Exception("Invalid input");
+		} else {
+			genreId = genreDAO.addGenreDAOWithID(genre);
+
+			if (genre.getBooks() != null && !genre.getBooks().isEmpty() && genreId > 0) {
 				for (Book b : genre.getBooks()) {
-					bdao.addBookGenres(genreId, b.getBookId());		
+					bookDAO.addBookGenres(genreId, b.getBookId());
 				}
 			}
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
 		}
 	}
 
-	public void udpateAuthor(Author author) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			AuthorDAO adao = new AuthorDAO(conn);
-			adao.updateAuthor(author);
-		   adao.deleteBookAuthor(author.getAuthorId());	
-			if (author.getBooks() != null && !author.getBooks().isEmpty()) {
-				for (Book b : author.getBooks()) {
-					
-					adao.addBookAuthors(author.getAuthorId(), b.getBookId());
-					
-				}
+	@Transactional
+	public void addBook(Book book) throws Exception {
+		Integer bookId = 0;
+
+		if (book == null || book.getTitle() == null || book.getTitle().length() == 0 || book.getTitle().length() > 45) {
+			throw new Exception("Invalid Input");
+		} else if (book == null || book.getPublisher() == null) {
+			throw new Exception("Invalid Input");
+		} else {
+			bookId = bookDAO.addBookWithID(book);
+		}
+
+		if (book.getAuthors() != null && !book.getAuthors().isEmpty()) {
+			for (Author a : book.getAuthors()) {
+				bookDAO.addBookAuthors(a.getAuthorId(), bookId);
 			}
-		  conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
 		}
-	}
-	
-	public void udpatePublisher(Publisher publisher) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			PublisherDAO pdao = new PublisherDAO(conn);
-			BookDAO bdao = new BookDAO(conn);
-
-			if (publisher.getBooks() != null && !publisher.getBooks().isEmpty()) {
-				for (Book b : publisher.getBooks()) {
-					bdao.updateBookPublisher(publisher.getPublisherId(), b.getBookId());
-				}
+		if (book.getGenres() != null && !book.getGenres().isEmpty()) {
+			for (Genre g : book.getGenres()) {
+				bookDAO.addBookGenres(g.getGenreId(), bookId);
 			}
-			
-			pdao.updatePublisher(publisher);
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
 		}
 	}
-	
-	
-	public void udpateLibraryBranch(LibraryBranch lbranch) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			LibraryBranchDAO lbdao = new LibraryBranchDAO(conn);
-		
-			
-			lbdao.updateLibraryBranch(lbranch);
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-	}
-	public void udpateGenre(Genre genre) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			GenreDAO gdao = new GenreDAO(conn);
-			gdao.deleteBookGenre(genre.getGenreId());
-			BookDAO bdao = new BookDAO(conn);
 
-			if (genre.getBooks() != null && !genre.getBooks().isEmpty()) {
-				for (Book b : genre.getBooks()) {
-					
-					bdao.addBookGenres(genre.getGenreId(), b.getBookId());		
-				}
+	@Transactional
+	public void udpateAuthor(Author author) throws ClassNotFoundException, Exception {
+
+		if (authorDAO.readAuthorByPk(author.getAuthorId()) == null) {
+			throw new Exception("The author you are trying to update does not exist");
+		}
+		authorDAO.updateAuthor(author);
+		authorDAO.deleteBookAuthor(author.getAuthorId());
+
+		if (author.getBooks() != null && !author.getBooks().isEmpty()) {
+			for (Book b : author.getBooks()) {
+				authorDAO.addBookAuthors(author.getAuthorId(), b.getBookId());
+
 			}
-			
-			gdao.updateGenre(genre);
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
 		}
 	}
 
-	public void deleteAuthor(Author author) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			AuthorDAO adao = new AuthorDAO(conn);
-			adao.deleteAuthor(author);
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
+	@Transactional
+	public void udpatePublisher(Publisher publisher) throws ClassNotFoundException, Exception {
+		if (publisherDAO.readPublisherByPk(publisher.getPublisherId()) == null) {
+			throw new Exception("Invalid input");
 		}
-	}
-	public void deletePublisher(Publisher publisher) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			PublisherDAO pdao = new PublisherDAO(conn);
-			pdao.deletePublisher(publisher);
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-	}
-	
-	public void deleteGenre(Genre genre) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			GenreDAO gdao = new GenreDAO(conn);
-			gdao.deleteGenre(genre);
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-	}
+		publisherDAO.updatePublisher(publisher);
 
-	public List<Author> readAuthors(Integer pageNo) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			AuthorDAO adao = new AuthorDAO(conn);
-
-			return adao.readAllAuthors(pageNo);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-		return null;
-	}
-	
-	
-	
-	public List<Publisher> readPublisher() throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			PublisherDAO pdao = new PublisherDAO(conn);
-
-			return pdao.readAllPublisher();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-		return null;
-	}
-	public List<LibraryBranch> readLibraryBranch() throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			LibraryBranchDAO lbdao = new LibraryBranchDAO(conn);
-
-			return lbdao.readAllLibraryBranches();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-		return null;
-	}
-	public List<Publisher> readPublishers() throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			PublisherDAO pdao = new PublisherDAO(conn);
-
-			return pdao.readAllPublisher();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-		return null;
-	}
-	public List<Genre> readGenres() throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			GenreDAO gdao = new GenreDAO(conn);
-			return gdao.readAllGenres();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-		return null;
-	}
-
-	public void addBook(Book book) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			BookDAO bdao = new BookDAO(conn);
-			Integer bookId = bdao.addBookWithID(book);
-			if (book.getAuthors() != null && !book.getAuthors().isEmpty()) {
-				for (Author a : book.getAuthors()) {
-					bdao.addBookAuthors(a.getAuthorId(), bookId);
-				}
+		if (publisher.getBooks() != null && !publisher.getBooks().isEmpty()) {
+			for (Book b : publisher.getBooks()) {
+				bookDAO.updateBookPublisher(publisher.getPublisherId(), b.getBookId());
 			}
-			if (book.getGenres() != null && !book.getGenres().isEmpty()) {
-				for (Genre g : book.getGenres()) {
-					bdao.addGenres(g.getGenreId(), bookId);
-				}
+		}
+
+	}
+
+	@Transactional
+	public void udpateLibraryBranch(LibraryBranch lbranch) throws ClassNotFoundException, Exception {
+
+		if (branchDAO.readLibraryBranchByPk(lbranch.getBranchId()) == null) {
+			throw new Exception("Invalid Input.");
+		} else {
+			branchDAO.updateLibraryBranch(lbranch);
+		}
+
+	}
+
+	@Transactional
+	public void udpateGenre(Genre genre) throws ClassNotFoundException, Exception {
+
+		if (genreDAO.readGenreByPk(genre.getGenreId()) == null) {
+			throw new Exception("Invalid input");
+		}
+
+		genreDAO.updateGenre(genre);
+		genreDAO.deleteBookGenre(genre.getGenreId());
+		if (genre.getBooks() != null && !genre.getBooks().isEmpty()) {
+			for (Book b : genre.getBooks()) {
+
+				bookDAO.addBookGenres(genre.getGenreId(), b.getBookId());
 			}
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
 		}
+
 	}
-	
-	
-	public void updateBook(Book book) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			System.out.println("connection");
-			BookDAO bdao = new BookDAO(conn);
-			
-			bdao.updateBook(book);
-			System.out.println("Book UPDATED");
 
-	        bdao.deleteBookAuthor(book.getBookId());
-			System.out.println("Author deleted ");
+	@Transactional
+	public void updateBook(Book book) throws ClassNotFoundException, Exception {
 
-	        bdao.deleteBookGenre(book.getBookId());
-			System.out.println("genre deleted ");
+		if (bookDAO.readBookByPk(book.getBookId()) == null) {
+			throw new Exception("Invalid input");
+		}
+		bookDAO.updateBook(book);
+		bookDAO.deleteBookAuthor(book.getBookId());
+		bookDAO.deleteBookGenre(book.getBookId());
 
-			if (book.getAuthors() != null && !book.getAuthors().isEmpty()) {
-				for (Author a : book.getAuthors()) {
-					bdao.addBookAuthors(a.getAuthorId(), book.getBookId());
-					System.out.println("authors  added ");
+		if (book.getAuthors() != null && !book.getAuthors().isEmpty()) {
+			for (Author a : book.getAuthors()) {
+				bookDAO.addBookAuthors(a.getAuthorId(), book.getBookId());
 
-				}
 			}
-			if (book.getGenres() != null && !book.getGenres().isEmpty()) {
-				for (Genre g : book.getGenres()) {
-					bdao.addGenres(g.getGenreId(), book.getBookId());
-					System.out.println("genre  added ");
+		}
+		if (book.getGenres() != null && !book.getGenres().isEmpty()) {
+			for (Genre g : book.getGenres()) {
+				bookDAO.addBookGenres(g.getGenreId(), book.getBookId());
 
-				}
 			}
-			System.out.println("ready to commit   ");
+		}
 
-			conn.commit();
-			System.out.println("committed   ");
+	}
 
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			//conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
+	public void deleteAuthor(Author author) throws SQLException, ClassNotFoundException {
+
+		if (author != null) {
+
+			authorDAO.deleteAuthor(author);
+
+		}
+
+	}
+
+	public void deletePublisher(Publisher publisher) throws SQLException, ClassNotFoundException {
+
+		if (publisher != null) {
+
+			publisherDAO.deletePublisher(publisher);
 		}
 	}
 
-	public void deleteBook(Book book) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			BookDAO bdao = new BookDAO(conn);
-			bdao.deleteBook(book);
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			conn.rollback();
-		} finally {
-			if (conn != null)
-				conn.close();
+	public void deleteGenre(Genre genre) throws SQLException, ClassNotFoundException {
+
+		if (genre != null) {
+
+			genreDAO.deleteGenre(genre);
+		}
+
+	}
+
+	public void deleteBook(Book book) throws SQLException, ClassNotFoundException {
+
+		if (book != null) {
+
+			bookDAO.deleteBook(book);
 		}
 	}
 
-	public List<Book> readBooks() throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			BookDAO bdao = new BookDAO(conn);
-			return bdao.readAllBooks();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-		return null;
-	}
+	public void deleteLibraryBranch(LibraryBranch lbranch) throws ClassNotFoundException, SQLException {
 
-	public Author readAuthorByPk(Integer authorId) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			AuthorDAO adao = new AuthorDAO(conn);
-			return adao.readAuthorByPk(authorId);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
+		if (lbranch != null) {
+
+			branchDAO.deleteLibraryBranch(lbranch);
 		}
 
-		return null;
-	}
-	
-	public Genre readGenreByPk(Integer genreId) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			GenreDAO gdao = new GenreDAO(conn);
-			return gdao.readGenreByPk(genreId);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-
-		return null;
 	}
 
+	public List<Genre> readGenres(Integer pageNo) throws SQLException, ClassNotFoundException {
 
-	public Publisher readPublisherByPk(Integer publisherId) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			PublisherDAO pdao = new PublisherDAO(conn);
-			return pdao.readPublisherByPk(publisherId);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
+		List<Genre> allGenres = genreDAO.readAllGenres();
+		return allGenres;
 
-		return null;
-	}
-	public List <Author> readAuthorsByName(String searchString) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			AuthorDAO adao = new AuthorDAO(conn);
-			return adao.readAllAuthorsByName(searchString);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-
-		return null;
-	}
-	public List <Author> readAuthorsByName(String searchString,Integer pageNo) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			AuthorDAO adao = new AuthorDAO(conn);
-			return adao.readAllAuthorsByName(searchString,pageNo);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-
-		return null;
-	}
-	public LibraryBranch readLibraryBranchByPk(Integer branchId) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			LibraryBranchDAO lbdao = new LibraryBranchDAO(conn);
-			return lbdao.readLibraryBranchByPk(branchId);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-
-		return null;
-	}
-	
-	
-
-	public Publisher  readPublisherByPK(Integer pubId) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			PublisherDAO pdao = new PublisherDAO(conn);
-			return pdao.readPublisherByPk(pubId);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-
-		return null;
 	}
 
+	public List<Author> readAuthors(Integer pageNo) throws SQLException, ClassNotFoundException {
 
-	public void deleteLibraryBranch(LibraryBranch lbranch) throws SQLException {
-		
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			LibraryBranchDAO lbdao = new LibraryBranchDAO(conn);
-			lbdao.deleteLibraryBranch(lbranch);
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-		
+		List<Author> allAuthors = authorDAO.readAllAuthors();
+		return allAuthors;
+
 	}
-	
-	public Integer getAuthorsCount() throws SQLException{
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			AuthorDAO adao = new AuthorDAO(conn);
-			return adao.getAuthorsCount();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally{
-			if(conn!=null)
-				conn.close();
+
+	public List<Publisher> readPublishers() throws SQLException, ClassNotFoundException {
+
+		List<Publisher> allPublishers = publisherDAO.readAllPublishers();
+		return allPublishers;
+
+	}
+
+	public List<LibraryBranch> readLibraryBranch() throws SQLException, ClassNotFoundException {
+
+		List<LibraryBranch> allLibraryBranchs = branchDAO.readAllLibraryBranches();
+		return allLibraryBranchs;
+
+	}
+
+	public List<Book> readBooks() throws SQLException, ClassNotFoundException {
+
+		List<Book> allBooks = bookDAO.readAllBooks();
+		return allBooks;
+	}
+
+	public Author readAuthorByPk(Integer authorId) throws SQLException, ClassNotFoundException {
+
+		return authorDAO.readAuthorByPk(authorId);
+
+	}
+
+	public Genre readGenreByPk(Integer genreId) throws SQLException, ClassNotFoundException {
+
+		return genreDAO.readGenreByPk(genreId);
+
+	}
+
+	public Publisher readPublisherByPk(Integer publisherId) throws ClassNotFoundException, SQLException {
+
+		return publisherDAO.readPublisherByPk(publisherId);
+
+	}
+
+	public Borrower readBorrowerByPK(Integer borrowerID) throws SQLException, ClassNotFoundException {
+
+		return borrowerDAO.readBorrowerByPk(borrowerID);
+
+	}
+
+	public LibraryBranch readLibraryBranchByPk(Integer branchId) throws ClassNotFoundException, SQLException {
+
+		return branchDAO.readLibraryBranchByPk(branchId);
+
+	}
+
+	public List<Author> readAuthorsByName(String searchString) throws ClassNotFoundException, SQLException {
+
+		return authorDAO.readAllAuthorsByName(searchString);
+
+	}
+
+	public Book readBookByPk(Integer bookId) throws SQLException, ClassNotFoundException {
+		return bookDAO.readBookByPk(bookId);
+	}
+
+	public List<Book> readBookByName(String bookTitle) throws SQLException, ClassNotFoundException {
+
+		if (bookTitle != null) {
+			return bookDAO.readAllBookByName(bookTitle);
 		}
 		return null;
 	}
 
+	public List<Genre> readGenreByName(String genreName) throws SQLException, ClassNotFoundException {
 
+		if (genreName != null) {
+			return genreDAO.readGenreByName(genreName);
+		} else {
 
-
-	public Book readBookByPk(Integer bookId) throws SQLException  {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			BookDAO bdao = new BookDAO(conn);
-			return bdao.readBookByPk(bookId);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
+			return null;
 		}
-		return null;
 	}
 
+	public List<Publisher> readPublisherbyName(String publisherName) throws ClassNotFoundException, SQLException {
 
+		if (publisherName != null) {
+			return publisherDAO.readPublisherByName(publisherName);
 
-
-	public List<Book> readBookByName(String bookTitle) throws SQLException {
-		
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			BookDAO bdao = new BookDAO(conn);
-			return bdao.readAllBookByName(bookTitle);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
+		} else {
+			return null;
 		}
-		return null;
 	}
 
+	public void checkOut(Integer cardNo, Integer branchId, Integer bookId) throws SQLException, ClassNotFoundException {
 
-
-
-	public List<Genre> readGenreByName(String genreName) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			GenreDAO gdao = new GenreDAO(conn);
-			return gdao.readGenreByName(genreName);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-		return null;
+		bookLoanDAO.checkOutBook(bookId, cardNo, branchId);
 	}
 
+	public void checkIn(String checkIn) throws SQLException, ClassNotFoundException {
 
-
-
-	public List<Publisher> readPublisherbyName(String publisherName) throws SQLException {
-		
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			PublisherDAO pdao = new PublisherDAO(conn);
-			
-			return pdao.readPublisherByName(publisherName);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (conn != null)
-				conn.close();
-		}
-		return null;
-	}
-
-
-
-
-	public Borrower readBorrowerByPK(Integer borrowerID) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = util.getConnection();
-			BorrowerDAO bdao = new BorrowerDAO(conn);
-			return bdao.readBorrowerByPk(borrowerID);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			
-			if (conn != null)
-				conn.close();
-		}
-
-		return null;
-	}
-	
-	
-	public void checkOut(Integer cardNo, Integer branchId, Integer bookId) throws SQLException {
-		Connection conn = null;
-		try {
-			
-			conn = util.getConnection();
-			BookLoanDAO bkDAO = new BookLoanDAO(conn);
-			bkDAO.checkOutBook(bookId, cardNo, branchId);;
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			
-			if (conn != null)
-				conn.close();
-		}
+		bookLoanDAO.returnCheckedOutBook(checkIn);
 
 	}
-	
-	
-	public void checkIn(String checkIn) throws SQLException {
-		Connection conn = null;
-		try {
-			
-			conn = util.getConnection();
-			BookLoanDAO bkDAO = new BookLoanDAO(conn);
-			bkDAO.returnCheckedOutBook(checkIn);
-			conn.commit();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			
-			if (conn != null)
-				conn.close();
-		}
-
-	}
-
-
-
 
 }

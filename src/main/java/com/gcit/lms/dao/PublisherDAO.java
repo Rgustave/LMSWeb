@@ -35,7 +35,7 @@ public class PublisherDAO extends BaseDAO implements ResultSetExtractor<List<Pub
 		
 		return template.query("SELECT * FROM tbl_publisher",this);
 	}
-	public void addGenre(Publisher publisher) throws SQLException, ClassNotFoundException {
+	public void addPublisher(Publisher publisher) throws SQLException, ClassNotFoundException {
 		template.update("insert into tbl_publisher (publisherName,publisherAddress,publisherPhone)"
 				+ " values (?,?,?)", new Object[] {publisher.getPublisherName(),publisher.
 						getPublisherAddress(),publisher.getPublisherPhone()});
