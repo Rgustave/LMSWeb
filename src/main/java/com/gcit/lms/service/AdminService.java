@@ -52,7 +52,7 @@ public class AdminService {
 		}
 		if (author.getBooks() != null && !author.getBooks().isEmpty()) {
 			for (Book b : author.getBooks()) {
-				bookDAO.addBookAuthors(authorId, b.getBookId());
+				authorDAO.addBookAuthors(authorId, b.getBookId());
 			}
 		}
 

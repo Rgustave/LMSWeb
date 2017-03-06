@@ -1,4 +1,9 @@
 <%@include file="includes/header.html"%>
+
+
+<%@page
+	import="org.springframework.web.servlet.support.RequestContextUtils"%>
+<%@page import="org.springframework.context.ApplicationContext"%>
 <%@include file="includes/nav.html"%>
 <%@page import="com.gcit.lms.entity.Author"%>
 <%@page import="com.gcit.lms.service.AdminService"%>
@@ -9,8 +14,9 @@
 <%@page import="com.gcit.lms.service.AdminService"%>
 
 <%
-	AdminService service = new AdminService();
-	List<Author> authors = new ArrayList<>();
+ApplicationContext ac = RequestContextUtils.getWebApplicationContext(request);
+AdminService service = (AdminService) ac.getBean("adminService");
+	List<Author> authors = new ArrayList<Author>();
 	List<Book> Allbooks = service.readBooks();
 	authors = service.readAuthors(1);
 %>

@@ -32,8 +32,10 @@ public class BookDAO extends BaseDAO implements ResultSetExtractor<List<Book>>{
 		return template.query("select * from tbl_book", this);
 	}
 	
+	
+	//authorId bookId 
 	public void addBookAuthors(Integer authorId, Integer bookId) throws ClassNotFoundException, SQLException{
-		template.update("insert into tbl_book_authors values (? , ?)", new Object[]{bookId, authorId}, this);
+		template.update("insert into tbl_book_authors  (bookId , authorId)  values(?,?)", new Object[]{bookId, authorId}, this);
 	}
 	
 	
