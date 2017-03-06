@@ -44,6 +44,13 @@ public class AuthorDAO extends BaseDAO implements ResultSetExtractor<List<Author
 		return null;
 	}
 	
+	
+	public List<Author> readAuthorsByBooks(Integer bookId){
+		return template.query("SELECT * FROM tbl_author WHERE authorId IN(SELECT"
+				+ " authorId FROM tbl_book_authors WHERE bookId= ? )", new Object[]{bookId}, this);
+	}
+	
+	
 	public void deleteBookAuthor(Integer authorId) throws SQLException, ClassNotFoundException {
 		 template.update("delete  from tbl_book_authors where authorId = ?", new Object[] {authorId});
 	}

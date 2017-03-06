@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
 
+import com.gcit.lms.entity.Author;
 import com.gcit.lms.entity.Book;
 
 public class BookDAO extends BaseDAO implements ResultSetExtractor<List<Book>>{
@@ -56,6 +57,20 @@ public class BookDAO extends BaseDAO implements ResultSetExtractor<List<Book>>{
 	
 	public List<Book> readAllBookByName(String bookTitle) throws ClassNotFoundException, SQLException {
 		return template.query("select * from tbl_book where title like ?", new Object[] { "%" + bookTitle + "%" },this);
+	}
+	
+	public List<Book> readBooksByAuthors(Integer authorId){
+		return template.query("select * from tbl_book where bookId IN (select bookId from tbl_book_authors where authorId = ?)", new Object[]{authorId}, this);
+	}
+	
+	
+	
+	public List<Book> readBooksByGenres(Integer genreId){
+		return template.query("SELECT *FROM tbl_book WHERE bookId IN( SELECT bookId  FROM tbl_book_genres WHERE genre_id = ?)", new Object[]{genreId}, this);
+	}
+	
+	public List<Book> readBooksByPublishers(Integer pubId){
+		return template.query("select * from tbl_book where pubId =? ", new Object[]{pubId}, this);
 	}
 	
 	

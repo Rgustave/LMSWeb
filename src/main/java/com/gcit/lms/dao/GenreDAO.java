@@ -45,6 +45,11 @@ public class GenreDAO extends BaseDAO implements ResultSetExtractor<List<Genre>>
 		return null;
 	}
 	
+	public List<Genre> readGenresByBooks(Integer bookId){
+		return template.query("SELECT *FROM tbl_genre WHERE genre_id IN( SELECT genre_id"
+				+ " FROM tbl_book_genres WHERE bookId = ?) ", new Object[]{bookId}, this);
+	}
+	
 	
 
 	public void deleteBookGenre( Integer genreId) throws ClassNotFoundException, SQLException {

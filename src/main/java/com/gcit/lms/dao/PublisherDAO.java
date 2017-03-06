@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 import com.gcit.lms.entity.Book;
+import com.gcit.lms.entity.Genre;
 import com.gcit.lms.entity.LibraryBranch;
 import com.gcit.lms.entity.Publisher;
 
@@ -22,10 +23,15 @@ public class PublisherDAO extends BaseDAO implements ResultSetExtractor<List<Pub
 		}
 		return null;
 	}
+	
 	public List<Publisher> readAllPublishers() throws ClassNotFoundException, SQLException {
 		return template.query("SELECT * FROM tbl_publisher", this);
 	}
 	
+	public List<Publisher> readPublisherByBooks(Integer bookId){
+		return template.query("SELECT *FROM tbl_publisher WHERE publisherId "
+				+ "IN( SELECT pubId FROM  tbl_book where bookId= ? ) ", new Object[]{bookId}, this);
+	}
 	public Integer addPublisherWithID(Publisher publisher) throws ClassNotFoundException, SQLException {
 		
 				return template.update("insert into tbl_publisher (publisherName,publisherAddress,publisherPhone) values (? , ?,?)",
@@ -49,6 +55,9 @@ public class PublisherDAO extends BaseDAO implements ResultSetExtractor<List<Pub
 	public void deletePublisher(Publisher publisher) throws SQLException, ClassNotFoundException {
 		template.update("delete  from tbl_publisher where publisherId = ?", new Object[] {publisher.getPublisherId()});
 	}
+
+	
+	
 
 	@Override
 	public List<Publisher> extractData(ResultSet rs) throws SQLException {

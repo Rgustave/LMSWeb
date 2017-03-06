@@ -224,6 +224,7 @@ public class AdminService {
 
 	}
 
+	@Transactional
 	public void deleteAuthor(Author author) throws SQLException, ClassNotFoundException {
 
 		if (author != null) {
@@ -234,6 +235,7 @@ public class AdminService {
 
 	}
 
+	@Transactional
 	public void deletePublisher(Publisher publisher) throws SQLException, ClassNotFoundException {
 
 		if (publisher != null) {
@@ -242,6 +244,7 @@ public class AdminService {
 		}
 	}
 
+	@Transactional
 	public void deleteGenre(Genre genre) throws SQLException, ClassNotFoundException {
 
 		if (genre != null) {
@@ -251,6 +254,7 @@ public class AdminService {
 
 	}
 
+	@Transactional
 	public void deleteBook(Book book) throws SQLException, ClassNotFoundException {
 
 		if (book != null) {
@@ -259,6 +263,7 @@ public class AdminService {
 		}
 	}
 
+	@Transactional
 	public void deleteLibraryBranch(LibraryBranch lbranch) throws ClassNotFoundException, SQLException {
 
 		if (lbranch != null) {
@@ -268,27 +273,51 @@ public class AdminService {
 
 	}
 
+	@Transactional
 	public List<Genre> readGenres(Integer pageNo) throws SQLException, ClassNotFoundException {
 
 		List<Genre> allGenres = genreDAO.readAllGenres();
+
+		if (allGenres != null && !allGenres.isEmpty()) {
+			for (Genre g : allGenres) {
+				g.setBooks(bookDAO.readBooksByGenres(g.getGenreId()));
+			}
+		}
+
 		return allGenres;
 
 	}
 
+	@Transactional
 	public List<Author> readAuthors(Integer pageNo) throws SQLException, ClassNotFoundException {
 
 		List<Author> allAuthors = authorDAO.readAllAuthors();
+
+		if (allAuthors != null && !allAuthors.isEmpty()) {
+			for (Author a : allAuthors) {
+				a.setBooks(bookDAO.readBooksByAuthors(a.getAuthorId()));
+			}
+		}
 		return allAuthors;
 
 	}
 
+	@Transactional
 	public List<Publisher> readPublishers() throws SQLException, ClassNotFoundException {
 
 		List<Publisher> allPublishers = publisherDAO.readAllPublishers();
+
+		if (allPublishers != null && !allPublishers.isEmpty()) {
+			for (Publisher p : allPublishers) {
+				p.setBooks(bookDAO.readBooksByPublishers(p.getPublisherId()));
+			}
+		}
+
 		return allPublishers;
 
 	}
 
+	@Transactional
 	public List<LibraryBranch> readLibraryBranch() throws SQLException, ClassNotFoundException {
 
 		List<LibraryBranch> allLibraryBranchs = branchDAO.readAllLibraryBranches();
@@ -296,9 +325,34 @@ public class AdminService {
 
 	}
 
+	@Transactional
 	public List<Book> readBooks() throws SQLException, ClassNotFoundException {
 
 		List<Book> allBooks = bookDAO.readAllBooks();
+
+		if (allBooks != null && !allBooks.isEmpty()) {
+			for (Book b : allBooks) {
+				b.setAuthors(authorDAO.readAuthorsByBooks(b.getBookId()));
+			}
+		}
+		if (allBooks != null && !allBooks.isEmpty()) {
+			for (Book b : allBooks) {
+				b.setGenres(genreDAO.readGenresByBooks(b.getBookId()));
+			}
+		}
+
+		if (allBooks != null && !allBooks.isEmpty()) {
+			for (Book b : allBooks) {
+				for (Publisher p : publisherDAO.readPublisherByBooks(b.getBookId())) {
+
+					b.setPublisher(p);
+
+				}
+
+			}
+
+		}
+
 		return allBooks;
 	}
 
@@ -308,40 +362,47 @@ public class AdminService {
 
 	}
 
+	@Transactional
 	public Genre readGenreByPk(Integer genreId) throws SQLException, ClassNotFoundException {
 
 		return genreDAO.readGenreByPk(genreId);
 
 	}
 
+	@Transactional
 	public Publisher readPublisherByPk(Integer publisherId) throws ClassNotFoundException, SQLException {
 
 		return publisherDAO.readPublisherByPk(publisherId);
 
 	}
 
+	@Transactional
 	public Borrower readBorrowerByPK(Integer borrowerID) throws SQLException, ClassNotFoundException {
 
 		return borrowerDAO.readBorrowerByPk(borrowerID);
 
 	}
 
+	@Transactional
 	public LibraryBranch readLibraryBranchByPk(Integer branchId) throws ClassNotFoundException, SQLException {
 
 		return branchDAO.readLibraryBranchByPk(branchId);
 
 	}
 
+	@Transactional
 	public List<Author> readAuthorsByName(String searchString) throws ClassNotFoundException, SQLException {
 
 		return authorDAO.readAllAuthorsByName(searchString);
 
 	}
 
+	@Transactional
 	public Book readBookByPk(Integer bookId) throws SQLException, ClassNotFoundException {
 		return bookDAO.readBookByPk(bookId);
 	}
 
+	@Transactional
 	public List<Book> readBookByName(String bookTitle) throws SQLException, ClassNotFoundException {
 
 		if (bookTitle != null) {
@@ -350,6 +411,7 @@ public class AdminService {
 		return null;
 	}
 
+	@Transactional
 	public List<Genre> readGenreByName(String genreName) throws SQLException, ClassNotFoundException {
 
 		if (genreName != null) {
@@ -360,6 +422,7 @@ public class AdminService {
 		}
 	}
 
+	@Transactional
 	public List<Publisher> readPublisherbyName(String publisherName) throws ClassNotFoundException, SQLException {
 
 		if (publisherName != null) {
@@ -370,11 +433,13 @@ public class AdminService {
 		}
 	}
 
+	@Transactional
 	public void checkOut(Integer cardNo, Integer branchId, Integer bookId) throws SQLException, ClassNotFoundException {
 
 		bookLoanDAO.checkOutBook(bookId, cardNo, branchId);
 	}
 
+	@Transactional
 	public void checkIn(String checkIn) throws SQLException, ClassNotFoundException {
 
 		bookLoanDAO.returnCheckedOutBook(checkIn);
