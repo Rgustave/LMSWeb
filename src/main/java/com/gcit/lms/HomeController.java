@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.gcit.lms.entity.Author;
 import com.gcit.lms.entity.Book;
+import com.gcit.lms.entity.Genre;
+import com.gcit.lms.entity.Publisher;
 import com.gcit.lms.service.AdminService;
 
 /**
@@ -189,8 +191,137 @@ public class HomeController {
 		return "author";
 	}
 
-	
-	
-	
-	
+	@RequestMapping(value = "/addBook", method = { RequestMethod.POST })
+	public String prepareAddBook(Locale locale, Model model,
+			@RequestParam(value = "bookTitle", required = false) String bookTitle,
+			@RequestParam(value = "pubId", required = false) int pubId,
+			@RequestParam(value = "genreIds", required = false) String[] genreIds,
+			@RequestParam(value = "authorIds", required = false) String[] authorIds)
+
+	{
+		Publisher publisher = null;
+		try {
+			publisher = adminService.readPublisherByPk(pubId);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		Book book = new Book();
+		List<Genre> genres = new ArrayList<Genre>();
+		List<Author> authors = new ArrayList<Author>();
+
+		if (genreIds != null && genreIds.length > 0) {
+			for (int i = 0; i < genreIds.length; i++) {
+				Genre g = new Genre();
+				g.setGenreId(Integer.parseInt(genreIds[i]));
+				genres.add(g);
+			}
+		}
+
+		if (authorIds != null && authorIds.length > 0) {
+			for (int i = 0; i < authorIds.length; i++) {
+				Author a = new Author();
+				a.setAuthorId(Integer.parseInt(authorIds[i]));
+				authors.add(a);
+			}
+		}
+		book.setGenres(genres);
+		book.setAuthors(authors);
+		book.setPublisher(publisher);
+		book.setTitle(bookTitle);
+
+		try {
+			adminService.addBook(book);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "book";
+	}
+
+	@RequestMapping(value = "/deleteBook", method = RequestMethod.GET)
+	public String prepareDeleteBook(Locale locale, Model model,
+			@RequestParam(value = "bookId", required = false) Integer id) {
+
+		Book book = new Book();
+		book.setBookId(id);
+		try {
+			adminService.deleteBook(book);
+			;
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		}
+		return "author";
+	}
+
+	@RequestMapping(value = "/editBook", method = RequestMethod.GET)
+	public String prepareeditBook(Locale locale, Model model,
+			@RequestParam(value = "bookId", required = false) Integer id) {
+
+		Book book = null;
+		try {
+			book = adminService.readBookByPk(id);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		}
+		model.addAttribute("book", book);
+
+		return "editBook";
+	}
+
+	@RequestMapping(value = "/editBook", method = { RequestMethod.POST })
+	public String editBook(Locale locale, Model model,
+			@RequestParam(value = "bookId", required = false) Integer bookId,
+			@RequestParam(value = "bookTitle", required = false) String bookTitle,
+			@RequestParam(value = "pubId", required = false) int pubId,
+			@RequestParam(value = "genreIds", required = false) String[] genreIds,
+			@RequestParam(value = "authorIds", required = false) String[] authorIds)
+
+	{
+
+		Book book = new Book();
+		List<Genre> genres = new ArrayList<Genre>();
+		List<Author> authors = new ArrayList<Author>();
+
+		Publisher publisher = null;
+		try {
+			publisher = adminService.readPublisherByPk(pubId);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		if (genreIds != null && genreIds.length > 0) {
+			for (int i = 0; i < genreIds.length; i++) {
+				Genre g = new Genre();
+				g.setGenreId(Integer.parseInt(genreIds[i]));
+				genres.add(g);
+			}
+		}
+		if (authorIds != null && authorIds.length > 0) {
+			for (int i = 0; i < authorIds.length; i++) {
+				Author a = new Author();
+				a.setAuthorId(Integer.parseInt(authorIds[i]));
+				authors.add(a);
+			}
+		}
+		
+		book.setBookId(bookId);
+		book.setGenres(genres);	
+		book.setAuthors(authors);
+		book.setPublisher(publisher);
+		book.setTitle(bookTitle);
+		try {
+			adminService.updateBook(book);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "book";
+	}
+
 }
