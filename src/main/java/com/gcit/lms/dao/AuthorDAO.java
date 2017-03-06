@@ -58,7 +58,7 @@ public class AuthorDAO extends BaseDAO implements ResultSetExtractor<List<Author
 	
 	public void addBookAuthors(Integer AuthorId, Integer bookId) throws ClassNotFoundException, SQLException {
 		 template.update("insert into tbl_book_authors (bookId,authorId ) values (? , ?)", new Object[] {bookId,AuthorId});
-	}//"insert into tbl_book_authors 
+	}
 	
 	@Override
 	public List<Author> extractData(ResultSet rs) throws SQLException{

@@ -1,4 +1,8 @@
 <%@include file="includes/header.html"%>
+
+<%@page
+	import="org.springframework.web.servlet.support.RequestContextUtils"%>
+<%@page import="org.springframework.context.ApplicationContext"%>
 <%@include file="includes/nav.html"%>
 <%@page import="com.gcit.lms.entity.Author"%>
 <%@page import="com.gcit.lms.entity.Genre"%>
@@ -13,14 +17,16 @@
 <%@page import="com.gcit.lms.service.AdminService"%>
 
 <%
-	AdminService service = new AdminService();
+	ApplicationContext ac = RequestContextUtils.getWebApplicationContext(request);
+	AdminService service = (AdminService) ac.getBean("adminService");
 	List<Book> Allbooks = service.readBooks();
 	List<Author> AllAuthors = service.readAuthors(1);
-	List<Genre> AllGenres = service.readGenres();
-	List<Publisher> AllPublisher = service.readPublisher();
-
+	List<Genre> AllGenres = service.readGenres(1);
+	List<Publisher> AllPublisher = service.readPublishers();
 %>
-<%Book book = (Book)request.getAttribute("book");%>
+<%
+	Book book = (Book) request.getAttribute("book");
+%>
 
 <div class="container">
 	<div class="row">
@@ -42,39 +48,36 @@
 	<div class="row">
 		<div class="col-sm-9 col-sm-offset-1">
 			<form action="editBook" method="post" class="form-inline">
-				<input type="text" class="form-control" name="bookTitle" value="<%=book.getTitle() %>">
-				<input type="hidden" name="bookId" value="<%=book.getBookId()%>">
-	
-		<select name="pubId" class="selectpicker  " >
-					
+				<input type="text" class="form-control" name="bookTitle"
+					value="<%=book.getTitle()%>"> <input type="hidden"
+					name="bookId" value="<%=book.getBookId()%>"> <select
+					name="pubId" class="selectpicker  ">
+
 					<%
-			for (Publisher p : AllPublisher) {
-		%>
-		<option value=<%=p.getPublisherId() %>><%=p.getPublisherName() %></option>
-		<%
-			}
-		%>
-				</select>
-			  <select name="genreIds" class="selectpicker  "  multiple>
-					
+						for (Publisher p : AllPublisher) {
+					%>
+					<option value=<%=p.getPublisherId()%>><%=p.getPublisherName()%></option>
 					<%
-			for (Genre g : AllGenres) {
-		%>
-		<option value=<%=g.getGenreId()%>><%=g.getGenreName()%></option>
-		<%
-			}
-		%>
-				</select>
-				
-				<select name="authorIds" class="selectpicker  "  multiple>
-					
+						}
+					%>
+				</select> <select name="genreIds" class="selectpicker  " multiple>
+
 					<%
-			for (Author a : AllAuthors) {
-		%>
-		<option value=<%=a.getAuthorId()%>><%=a.getAuthorName()%></option>
-		<%
-			}
-		%>
+						for (Genre g : AllGenres) {
+					%>
+					<option value=<%=g.getGenreId()%>><%=g.getGenreName()%></option>
+					<%
+						}
+					%>
+				</select> <select name="authorIds" class="selectpicker  " multiple>
+
+					<%
+						for (Author a : AllAuthors) {
+					%>
+					<option value=<%=a.getAuthorId()%>><%=a.getAuthorName()%></option>
+					<%
+						}
+					%>
 				</select>
 
 
@@ -108,17 +111,19 @@
 					<tr>
 
 						<td scope="row"><%=Allbooks.indexOf(b) + 1%></td>
-						<td><%=b.getTitle() %></td>
-						<td><% if(b.getPublisher()!=null){
-							out.println(b.getPublisher().getPublisherName());
-						}
-							
-						%></td>
-						
+						<td><%=b.getTitle()%></td>
+						<td>
+							<%
+								if (b.getPublisher() != null) {
+										out.println(b.getPublisher().getPublisherName());
+									}
+							%>
+						</td>
+
 						<td>
 							<%
 								if (b.getGenres() != null && !b.getGenres().isEmpty()) {
-										List<Genre> genres = b.getGenres() ;
+										List<Genre> genres = b.getGenres();
 										for (Genre gr : genres) {
 											out.println(gr.getGenreName());
 											out.println(", ");
@@ -128,9 +133,9 @@
 
 
 						</td>
-							<td>
+						<td>
 							<%
-								if ( b.getAuthors()!= null && !b.getAuthors().isEmpty()) {
+								if (b.getAuthors() != null && !b.getAuthors().isEmpty()) {
 										List<Author> authors = b.getAuthors();
 										for (Author a : authors) {
 											out.println(a.getAuthorName());

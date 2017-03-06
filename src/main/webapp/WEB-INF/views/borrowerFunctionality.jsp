@@ -24,8 +24,8 @@
 	AdminService service = new AdminService();
 	List<Book> Allbooks = service.readBooks();
 	List<Author> AllAuthors = service.readAuthors(1);
-	List<Genre> AllGenres = service.readGenres();
-	List<Publisher> AllPublisher = service.readPublisher();
+	List<Genre> AllGenres = service.readGenres(1);
+	List<Publisher> AllPublisher = service.readPublishers();
 	List<LibraryBranch> lbranches = service.readLibraryBranch();
 
 %>

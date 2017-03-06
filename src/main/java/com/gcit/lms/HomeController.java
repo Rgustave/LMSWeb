@@ -66,11 +66,7 @@ public class HomeController {
 		return "genre";
 	}
 
-	@RequestMapping(value = "/editBook", method = RequestMethod.GET)
-	public String editBook(Locale locale, Model model) {
-		return "editBook";
-	}
-
+	
 	@RequestMapping(value = "/librarian", method = RequestMethod.GET)
 	public String librarian(Locale locale, Model model) {
 		return "librarian";

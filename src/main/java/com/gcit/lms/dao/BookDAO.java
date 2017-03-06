@@ -25,7 +25,7 @@ public class BookDAO extends BaseDAO implements ResultSetExtractor<List<Book>>{
 	}
 	
 	public void deleteBook(Book book) throws ClassNotFoundException, SQLException{
-		template.update("delete * from tbl_book where bookId= ? ", new Object[]{book.getBookId()});
+		template.update("delete from tbl_book where bookId= ? ", new Object[]{book.getBookId()});
 	}
 	
 	public List<Book> readAllBooks() throws ClassNotFoundException, SQLException{
@@ -35,7 +35,7 @@ public class BookDAO extends BaseDAO implements ResultSetExtractor<List<Book>>{
 	
 	//authorId bookId 
 	public void addBookAuthors(Integer authorId, Integer bookId) throws ClassNotFoundException, SQLException{
-		template.update("insert into tbl_book_authors  (bookId , authorId)  values(?,?)", new Object[]{bookId, authorId}, this);
+		template.update("insert into tbl_book_authors  (bookId , authorId)  values(?,?)", new Object[]{bookId, authorId});
 	}
 	
 	

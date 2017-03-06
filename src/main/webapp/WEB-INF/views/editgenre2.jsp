@@ -14,7 +14,7 @@
 	AdminService service = new AdminService();
 	List<Genre> genres = new ArrayList<>();
 	List<Book> Allbooks = service.readBooks();
-	genres = service.readGenres();
+	genres = service.readGenres(1);
 %>
 <%Genre genre = (Genre)request.getAttribute("genre");%>
 

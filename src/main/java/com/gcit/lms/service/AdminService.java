@@ -36,20 +36,12 @@ public class AdminService {
 	@Autowired
 	BookLoanDAO bookLoanDAO;
 
-	ConnectionUtil util = new ConnectionUtil();
 
 	@Transactional
 	public void addAuthor(Author author) throws Exception {
 
-		Integer authorId = 0;
-
-		if (author == null || author.getAuthorName() == null || author.getAuthorName().length() == 0
-				|| author.getAuthorName().length() > 45) {
-			throw new Exception("Invalid Input");
-		} else {
-
-			authorId = authorDAO.addAuthorDAOWithID(author);
-		}
+		Integer authorId = authorDAO.addAuthorDAOWithID(author);
+	
 		if (author.getBooks() != null && !author.getBooks().isEmpty()) {
 			for (Book b : author.getBooks()) {
 				authorDAO.addBookAuthors(authorId, b.getBookId());
@@ -99,12 +91,7 @@ public class AdminService {
 
 	@Transactional
 	public void addGenre(Genre genre) throws Exception {
-		Integer genreId = 0;
-		if (genre == null || genre.getGenreName() == null || genre.getGenreName().length() == 0
-				|| genre.getGenreName().length() > 45) {
-			throw new Exception("Invalid input");
-		} else {
-			genreId = genreDAO.addGenreDAOWithID(genre);
+		Integer genreId = genreDAO.addGenreDAOWithID(genre);
 
 			if (genre.getBooks() != null && !genre.getBooks().isEmpty() && genreId > 0) {
 				for (Book b : genre.getBooks()) {
@@ -112,19 +99,12 @@ public class AdminService {
 				}
 			}
 		}
-	}
+	
 
 	@Transactional
 	public void addBook(Book book) throws Exception {
-		Integer bookId = 0;
-
-		if (book == null || book.getTitle() == null || book.getTitle().length() == 0 || book.getTitle().length() > 45) {
-			throw new Exception("Invalid Input");
-		} else if (book == null || book.getPublisher() == null) {
-			throw new Exception("Invalid Input");
-		} else {
-			bookId = bookDAO.addBookWithID(book);
-		}
+		Integer bookId =  bookDAO.addBookWithID(book);
+		
 
 		if (book.getAuthors() != null && !book.getAuthors().isEmpty()) {
 			for (Author a : book.getAuthors()) {
