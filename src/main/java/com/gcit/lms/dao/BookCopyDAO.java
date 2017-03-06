@@ -58,12 +58,6 @@ public class BookCopyDAO extends BaseDAO implements ResultSetExtractor<List<Book
 		return noOfCopies;
 	}
 
-	public BookCopy updateNoOfCopies(BookLoan bl) {
-		BookCopy bc = new BookCopy();
-		bc.setBookId(bl.getBook().getBookId());
-		bc.setBranchId(bl.getLibraryBranch().getBranchId());
-		return bc;
-	}
 
 	public void addBookCopies(BookCopy bc, int NoOfCopies) {
 

@@ -23,18 +23,18 @@
 
 
 <%
-ApplicationContext ac = RequestContextUtils.getWebApplicationContext(request);
-AdminService service = (AdminService) ac.getBean("adminService");
-BorrowerService brservice = (BorrowerService) ac.getBean("brservice");
+	ApplicationContext ac = RequestContextUtils.getWebApplicationContext(request);
+	AdminService service = (AdminService) ac.getBean("adminService");
+	BorrowerService brservice = (BorrowerService) ac.getBean("brservice");
 	List<Book> Allbooks = service.readBooks();
 	List<Author> AllAuthors = service.readAuthors(1);
 	List<Genre> AllGenres = service.readGenres(1);
 	List<Publisher> AllPublisher = service.readPublishers();
 	List<LibraryBranch> lbranches = service.readLibraryBranch();
-
 %>
-<%Borrower borrower = (Borrower)request.getAttribute("borrower");
-List<BookLoan> bookloans = brservice.readBookLoans(borrower.getCardNo());
+<%
+	Borrower borrower = (Borrower) request.getAttribute("borrower");
+	List<BookLoan> bookloans = brservice.readBookLoans(borrower.getCardNo());
 %>
 
 <nav class="navbar navbar-default navbar-fixed-top">
@@ -54,7 +54,7 @@ List<BookLoan> bookloans = brservice.readBookLoans(borrower.getCardNo());
 			<ul class="nav navbar-nav navbar-right">
 				<p class="navbar-text">
 					Logged in as
-					<%=borrower.getName() %></p>
+					<%=borrower.getName()%></p>
 			</ul>
 		</div>
 		<!--/.nav-collapse -->
@@ -66,19 +66,18 @@ List<BookLoan> bookloans = brservice.readBookLoans(borrower.getCardNo());
 
 
 <script>
-function searchBook(){
-	$.ajax({
-		   url: "searchBooks",
-		   method: "post",
-		   data: {
-		      searchString: $('#searchString').val(),
-		      pageNo:$('#pageNo').val(),
-		   }
-		}).done(function( data ) {
-		    $('#booksTable').html(data);
-		 });
-}
-
+	function searchBook() {
+		$.ajax({
+			url : "searchBooks",
+			method : "post",
+			data : {
+				searchString : $('#searchString').val(),
+				pageNo : $('#pageNo').val(),
+			}
+		}).done(function(data) {
+			$('#booksTable').html(data);
+		});
+	}
 </script>
 <div class="container">
 	<div class="row">
@@ -105,25 +104,25 @@ function searchBook(){
 		<div class="col-sm-9 col-sm-offset-1">
 			<form action="checkOutBook" method="post" class="form-inline">
 				<input type="hidden" name="cardNo"
-					value="<%=borrower.getCardNo() %>"> <select name="branchId"
+					value="<%=borrower.getCardNo()%>"> <select name="branchId"
 					class="selectpicker  ">
 
 					<%
-			for (LibraryBranch lb : lbranches) {
-		%>
+						for (LibraryBranch lb : lbranches) {
+					%>
 					<option value=<%=lb.getBranchId()%>><%=lb.getBranchName()%></option>
 					<%
-			}
-		%>
+						}
+					%>
 				</select> <select name="bookId" class="selectpicker  ">
 
 					<%
-			for (Book b : Allbooks) {
-		%>
+						for (Book b : Allbooks) {
+					%>
 					<option value=<%=b.getBookId()%>><%=b.getTitle()%></option>
 					<%
-			}
-		%>
+						}
+					%>
 				</select>
 
 
@@ -156,42 +155,41 @@ function searchBook(){
 					<tr>
 
 						<td scope="row"><%=bookloans.indexOf(bl) + 1%></td>
-						<%-- 						<td><%=if(bl.getBook())bl.getBook().getTitle() %></td>
- --%>
+
 						<td>
-							<% if(bl.getBook()!=null){
-							out.println(bl.getBook().getTitle());
-						}
-							
-						%>
+							<%
+								if (bl.getBookId() > 0) {
+										out.println(service.readBookByPk(bl.getBookId()).getTitle());
+									}
+							%>
 						</td>
 
 						<td>
-							<% if(bl.getLibraryBranch()!=null){
-							out.println(bl.getLibraryBranch().getBranchName());
-						}
-							
-						%>
+							<%
+								if (bl.getLibraryBranch() > 0) {
+										out.println(service.readLibraryBranchByPk(bl.getLibraryBranch()).getBranchName());
+									}
+							%>
 						</td>
 
 
-						<td><%=bl.getCheckoutTime() %></td>
-						<td><%=bl.getDueDate() %></td>
+						<td><%=bl.getCheckoutTime()%></td>
+						<td><%=bl.getDueDate()%></td>
 
 
 						<td>
-							<% if(bl.getCheckin()==null){
-							out.println("NOT YET");
-						}
-							
-						%>
+							<%
+								if (bl.getCheckin() == null) {
+										out.println("NOT YET");
+									}
+							%>
 						</td>
 
 
 
 
 						<td><button type="button" class="btn btn-sm btn-warning"
-								onclick="javascript:location.href='checkIn?checkoutTime=<%=bl.getCheckoutTime() %>'">CHEK-IN</button></td>
+								onclick="javascript:location.href='checkIn?checkoutTime=<%=bl.getCheckoutTime()%>'">CHEK-IN</button></td>
 					<tr>
 						<%
 							}

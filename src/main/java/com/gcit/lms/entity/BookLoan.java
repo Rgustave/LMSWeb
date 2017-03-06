@@ -2,11 +2,15 @@ package com.gcit.lms.entity;
 
 import java.io.Serializable;
 
-public class BookLoan {
+public class BookLoan implements Serializable {
 	 
-	private Book book;
-	private Borrower borrower;
-	private LibraryBranch libraryBranch;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1577383530394711881L;
+	private int bookId;
+	private int cardNo;
+	private int branchId;
 	private String  checkoutTime;
 	private String  dueDate;
 	private String  checkinDate;
@@ -19,41 +23,41 @@ public class BookLoan {
 	/**
 	 * @return the book
 	 */
-	public Book getBook() {
-		return book;
+	public int getBookId() {
+		return bookId;
 	}
 	/**
 	 * @param book the book to set
 	 */
-	public void setBook(Book book) {
-		this.book = book;
+	public void setBook(int bookId) {
+		this.bookId = bookId;
 	}
 	/**
 	 * @return the borrower
 	 */
-	public Borrower getBorrower() {
-		return borrower;
+	public int getBorrower() {
+		return cardNo;
 	}
 	/**
 	 * @param borrower the borrower to set
 	 */
-	public void setBorrower(Borrower borrower) {
-		this.borrower = borrower;
+	public void setBorrower(int cardNo) {
+		this.cardNo = cardNo;
 	}
 	/**
 	 * @return the libraryBranch
 	 */
-	public LibraryBranch getLibraryBranch()  {
+	public int getLibraryBranch()  {
 		
 		
 		
-		return libraryBranch;
+		return branchId;
 	}
 	/**
 	 * @param libraryBranch the libraryBranch to set
 	 */
-	public void setLibraryBranch(LibraryBranch libraryBranch) {
-		this.libraryBranch = libraryBranch;
+	public void setLibraryBranch(int libraryBranch) {
+		this.branchId = libraryBranch;
 	}
 	/**
 	 * @return the checkoutTime
@@ -98,12 +102,11 @@ public class BookLoan {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((book == null) ? 0 : book.hashCode());
-		result = prime * result + ((borrower == null) ? 0 : borrower.hashCode());
+		result = prime * result + bookId;
+		result = prime * result + branchId;
+		result = prime * result + cardNo;
 		result = prime * result + ((checkinDate == null) ? 0 : checkinDate.hashCode());
 		result = prime * result + ((checkoutTime == null) ? 0 : checkoutTime.hashCode());
-		result = prime * result + ((dueDate == null) ? 0 : dueDate.hashCode());
-		result = prime * result + ((libraryBranch == null) ? 0 : libraryBranch.hashCode());
 		return result;
 	}
 	/* (non-Javadoc)
@@ -118,15 +121,11 @@ public class BookLoan {
 		if (getClass() != obj.getClass())
 			return false;
 		BookLoan other = (BookLoan) obj;
-		if (book == null) {
-			if (other.book != null)
-				return false;
-		} else if (!book.equals(other.book))
+		if (bookId != other.bookId)
 			return false;
-		if (borrower == null) {
-			if (other.borrower != null)
-				return false;
-		} else if (!borrower.equals(other.borrower))
+		if (branchId != other.branchId)
+			return false;
+		if (cardNo != other.cardNo)
 			return false;
 		if (checkinDate == null) {
 			if (other.checkinDate != null)
@@ -137,16 +136,6 @@ public class BookLoan {
 			if (other.checkoutTime != null)
 				return false;
 		} else if (!checkoutTime.equals(other.checkoutTime))
-			return false;
-		if (dueDate == null) {
-			if (other.dueDate != null)
-				return false;
-		} else if (!dueDate.equals(other.dueDate))
-			return false;
-		if (libraryBranch == null) {
-			if (other.libraryBranch != null)
-				return false;
-		} else if (!libraryBranch.equals(other.libraryBranch))
 			return false;
 		return true;
 	}
