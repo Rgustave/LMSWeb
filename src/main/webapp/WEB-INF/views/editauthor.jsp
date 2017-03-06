@@ -14,13 +14,15 @@
 <%@page import="com.gcit.lms.service.AdminService"%>
 
 <%
-ApplicationContext ac = RequestContextUtils.getWebApplicationContext(request);
-AdminService service = (AdminService) ac.getBean("adminService");
+	ApplicationContext ac = RequestContextUtils.getWebApplicationContext(request);
+	AdminService service = (AdminService) ac.getBean("adminService");
 	List<Author> authors = new ArrayList<Author>();
 	List<Book> Allbooks = service.readBooks();
 	authors = service.readAuthors(1);
 %>
-<%Author author = (Author)request.getAttribute("author");%>
+<%
+	Author author = (Author) request.getAttribute("author");
+%>
 
 <div class="container">
 	<div class="row">
@@ -42,18 +44,18 @@ AdminService service = (AdminService) ac.getBean("adminService");
 	<div class="row">
 		<div class="col-sm-9 col-sm-offset-1">
 			<form action="editAuthor" method="post" class="form-inline">
-				<input type="text" class="form-control"
-					name="authorName" value="<%=author.getAuthorName() %>">
-						<input type="hidden" name="authorId" value="<%=author.getAuthorId() %>">
-					 <select name="bookIds" class="selectpicker  "  multiple>
-					
+				<input type="text" class="form-control" name="authorName"
+					value="<%=author.getAuthorName()%>"> <input type="hidden"
+					name="authorId" value="<%=author.getAuthorId()%>"> <select
+					name="bookIds" class="selectpicker  " multiple>
+
 					<%
-			for (Book b : Allbooks) {
-		%>
-		<option value=<%=b.getBookId()%>><%=b.getTitle()%></option>
-		<%
-			}
-		%>
+						for (Book b : Allbooks) {
+					%>
+					<option value=<%=b.getBookId()%>><%=b.getTitle()%></option>
+					<%
+						}
+					%>
 				</select>
 
 

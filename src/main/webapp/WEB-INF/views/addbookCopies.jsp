@@ -1,4 +1,8 @@
 <%@include file="includes/header.html"%>
+
+<%@page
+	import="org.springframework.web.servlet.support.RequestContextUtils"%>
+<%@page import="org.springframework.context.ApplicationContext"%>
 <%@page import="com.gcit.lms.entity.Author"%>
 <%@page import="com.gcit.lms.entity.Borrower"%>
 <%@page import="com.gcit.lms.entity.BookLoan"%>
@@ -24,16 +28,17 @@
 
 
 <%
-    BorrowerService brservice = new BorrowerService();
-	LibrarianService lbservice = new LibrarianService();
-	AdminService service = new AdminService();
+	ApplicationContext ac = RequestContextUtils.getWebApplicationContext(request);
+	AdminService service = (AdminService) ac.getBean("adminService");
+	BorrowerService brservice = (BorrowerService) ac.getBean("brservice");
+	LibrarianService lbservice = (LibrarianService) ac.getBean("lbservice");
+
 	List<Book> Allbooks = service.readBooks();
 	List<BookCopy> allBookCopy = lbservice.readBookCopies();
 	List<Author> AllAuthors = service.readAuthors(1);
-	List<Genre> AllGenres = service.readGenres();
-	List<Publisher> AllPublisher = service.readPublisher();
+	List<Genre> AllGenres = service.readGenres(1);
+	List<Publisher> AllPublisher = service.readPublishers();
 	List<LibraryBranch> lbranches = service.readLibraryBranch();
-
 %>
 
 
@@ -61,19 +66,18 @@
 </nav>
 
 <script>
-function searchBook(){
-	$.ajax({
-		   url: "searchBooks",
-		   method: "post",
-		   data: {
-		      searchString: $('#searchString').val(),
-		      pageNo:$('#pageNo').val(),
-		   }
-		}).done(function( data ) {
-		    $('#booksTable').html(data);
-		 });
-}
-
+	function searchBook() {
+		$.ajax({
+			url : "searchBooks",
+			method : "post",
+			data : {
+				searchString : $('#searchString').val(),
+				pageNo : $('#pageNo').val(),
+			}
+		}).done(function(data) {
+			$('#booksTable').html(data);
+		});
+	}
 </script>
 <div class="container">
 	<div class="row">
@@ -99,25 +103,24 @@ function searchBook(){
 	<div class="row">
 		<div class="col-sm-9 col-sm-offset-1">
 			<form action="checkOutBook" method="post" class="form-inline">
-				 <select name="branchId"
-					class="selectpicker  ">
+				<select name="branchId" class="selectpicker  ">
 
 					<%
-			for (LibraryBranch lb : lbranches) {
-		%>
+						for (LibraryBranch lb : lbranches) {
+					%>
 					<option value=<%=lb.getBranchId()%>><%=lb.getBranchName()%></option>
 					<%
-			}
-		%>
+						}
+					%>
 				</select> <select name="bookId" class="selectpicker  ">
 
 					<%
-			for (Book b : Allbooks) {
-		%>
+						for (Book b : Allbooks) {
+					%>
 					<option value=<%=b.getBookId()%>><%=b.getTitle()%></option>
 					<%
-			}
-		%>
+						}
+					%>
 				</select> <input name="noOfCopies" type="text" class="form-control"
 					placeholder="Enter number of copies">
 
@@ -136,7 +139,8 @@ function searchBook(){
 						<th>#</th>
 						<th>Book</th>
 						<th>Library Branch</th>
-						<th>Number of Copies </th>
+						<th>Number of Copies</th>
+
 					</tr>
 				</thead>
 				<tbody>
@@ -149,34 +153,22 @@ function searchBook(){
 						<%-- 						<td><%=if(bl.getBook())bl.getBook().getTitle() %></td>
  --%>
 						<td>
-							<% if(bc.getBook()!=null){
-							out.println(bc.getBook().getTitle());
-						}
-							
-						%>
+							<%
+								out.println(service.readBookByPk(bc.getBookId()).getTitle());
+							%>
 						</td>
 
 						<td>
-							<% if(bc.getLibraryBranch()!=null){
-							out.println(bc.getLibraryBranch().getBranchName());
-						}
-							
-						%>
+							<%
+								out.println(service.readLibraryBranchByPk(bc.getBranchId()).getBranchName());
+							%>
 						</td>
 
 						<td>
-							<% if(bc.getBookCopies()!=null){
-							out.println(bc.getBookCopies());
-						}
-							
-						%>
+							<%
+								out.println(bc.getNoOfCopies());
+							%>
 						</td>
-
-
-
-
-						<%-- <td><button type="button" class="btn btn-sm btn-warning"
-								onclick="javascript:location.href='checkIn?checkoutTime=<%=bc.getBook().getBookId() %>'">CHEK-IN</button></td> --%>
 					<tr>
 						<%
 							}

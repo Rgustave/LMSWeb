@@ -1,5 +1,8 @@
 
 <%@include file="includes/header.html"%>
+<%@page
+	import="org.springframework.web.servlet.support.RequestContextUtils"%>
+<%@page import="org.springframework.context.ApplicationContext"%>
 <%@include file="includes/nav.html"%>
 <%@page import="com.gcit.lms.entity.LibraryBranch"%>
 <%@page import="com.gcit.lms.service.AdminService"%>
@@ -10,12 +13,15 @@
 <%@page import="com.gcit.lms.service.AdminService"%>
 
 <%
-	AdminService service = new AdminService();
+	ApplicationContext ac = RequestContextUtils.getWebApplicationContext(request);
+	AdminService service = (AdminService) ac.getBean("adminService");
 	List<LibraryBranch> libraryBranches = new ArrayList<>();
 	List<Book> Allbooks = service.readBooks();
 	libraryBranches = service.readLibraryBranch();
 %>
-<%LibraryBranch libraryBranch = (LibraryBranch)request.getAttribute("lbranch");%>
+<%
+	LibraryBranch libraryBranch = (LibraryBranch) request.getAttribute("lbranch");
+%>
 
 <div class="container">
 	<div class="row">
@@ -39,11 +45,11 @@
 		<div class="col-sm-9 col-sm-offset-1">
 			<form action="editlBranch" method="post" class="form-inline">
 				<input name="lbranchName" type="text" class="form-control"
-					value="<%=libraryBranch.getBranchName() %>"> <input
+					value="<%=libraryBranch.getBranchName()%>"> <input
 					type="hidden" name="branchId"
 					value="<%=libraryBranch.getBranchId()%>"> <input
 					name="lbranchAddress" type="text" class="form-control"
-					value="<%=libraryBranch.getBranchAddress() %>">
+					value="<%=libraryBranch.getBranchAddress()%>">
 
 				<button type="submit" class="btn btn-primary">Edit Library
 					Branch</button>

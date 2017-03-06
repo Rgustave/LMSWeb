@@ -1,5 +1,8 @@
 
 <%@include file="includes/header.html"%>
+<%@page
+	import="org.springframework.web.servlet.support.RequestContextUtils"%>
+<%@page import="org.springframework.context.ApplicationContext"%>
 <%@page import="com.gcit.lms.entity.LibraryBranch"%>
 <%@page import="com.gcit.lms.service.AdminService"%>
 <%@page import="java.util.ArrayList"%>
@@ -9,34 +12,38 @@
 <%@page import="com.gcit.lms.service.AdminService"%>
 
 <%
-	AdminService service = new AdminService();
+	ApplicationContext ac = RequestContextUtils.getWebApplicationContext(request);
+	AdminService service = (AdminService) ac.getBean("adminService");
 	List<LibraryBranch> libraryBranches = new ArrayList<>();
 	List<Book> Allbooks = service.readBooks();
 	libraryBranches = service.readLibraryBranch();
 %>
 
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand em-text" href="index.jsp">LABRARY MANAGMENT SYSTEM</a>
-        </div>
-        <div id="navbar " class="collapse navbar-collapse">
-          <ul class="nav navbar-nav navbar-right">
+<nav class="navbar navbar-default navbar-fixed-top">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed"
+				data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+				aria-controls="navbar">
+				<span class="sr-only">Toggle navigation</span> <span
+					class="icon-bar"></span> <span class="icon-bar"></span> <span
+					class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand em-text" href="index.jsp">LABRARY
+				MANAGMENT SYSTEM</a>
+		</div>
+		<div id="navbar " class="collapse navbar-collapse">
+			<ul class="nav navbar-nav navbar-right">
 				<li><a href="addbookCopies.jsp">Add Book Copies</a></li>
-		
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
 
-    
-    
+			</ul>
+		</div>
+		<!--/.nav-collapse -->
+	</div>
+</nav>
+
+
+
 <div class="container">
 	<div class="row">
 		<div class="col-sm-9 col-sm-offset-1">
@@ -96,7 +103,6 @@
 
 						<td><button type="button" class="btn btn-sm btn-warning"
 								onclick="javascript:location.href='LibrianeditlBranch?branchId=<%=lb.getBranchId()%>'">Edit</button></td>
-						
 					<tr>
 						<%
 							}

@@ -1,4 +1,7 @@
 <%@include file="includes/header.html"%>
+<%@page
+	import="org.springframework.web.servlet.support.RequestContextUtils"%>
+<%@page import="org.springframework.context.ApplicationContext"%>
 <%@include file="includes/nav.html"%>
 
 <%@page import="com.gcit.lms.service.AdminService"%>
@@ -11,12 +14,15 @@
 <%@page import="com.gcit.lms.service.AdminService"%>
 
 <%
-	AdminService service = new AdminService();
+	ApplicationContext ac = RequestContextUtils.getWebApplicationContext(request);
+	AdminService service = (AdminService) ac.getBean("adminService");
 	List<Genre> genres = new ArrayList<>();
 	List<Book> Allbooks = service.readBooks();
 	genres = service.readGenres(1);
 %>
-<%Genre genre = (Genre)request.getAttribute("genre");%>
+<%
+	Genre genre = (Genre) request.getAttribute("genre");
+%>
 
 
 <div class="container">
@@ -40,18 +46,17 @@
 		<div class="col-sm-9 col-sm-offset-1">
 			<form action="editGenre" method="post" class="form-inline">
 				<input name="genreName" type="text" class="form-control"
-					value="<%=genre.getGenreName() %>">
-			<input type="hidden" name="genreId" value="<%=genre.getGenreId() %>">
-					
-					 <select name="bookIds" class="selectpicker  "  multiple>
-					
+					value="<%=genre.getGenreName()%>"> <input type="hidden"
+					name="genreId" value="<%=genre.getGenreId()%>"> <select
+					name="bookIds" class="selectpicker  " multiple>
+
 					<%
-			for (Book b : Allbooks) {
-		%>
-		<option value=<%=b.getBookId()%>><%=b.getTitle()%></option>
-		<%
-			}
-		%>
+						for (Book b : Allbooks) {
+					%>
+					<option value=<%=b.getBookId()%>><%=b.getTitle()%></option>
+					<%
+						}
+					%>
 				</select>
 
 				<button type="submit" class="btn btn-primary">Edit Genre</button>
